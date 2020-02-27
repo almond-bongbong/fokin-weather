@@ -1,13 +1,31 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Platform, Text, View } from 'react-native';
+import { Platform, Text } from 'react-native';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
-import Loading from './src/Loading';
+import { getWeather } from './src/api/weather';
+import Loading from './src/components/Loading';
+import Weather from './src/components/Weather/Weather';
+
+interface WeatherData {
+  main: {
+    temp: number;
+  };
+}
 
 function App() {
-  const [location, setLocation] = useState<Location.LocationData | null>(null);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+
+  const initWeather = async (latitude: number, longitude: number) => {
+    try {
+      const { data } = await getWeather(latitude, longitude);
+      setWeather(data);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const getLocationAsync = useCallback(async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
@@ -16,23 +34,30 @@ function App() {
     }
 
     const location = await Location.getCurrentPositionAsync({});
-    setLocation(location);
+    await initWeather(location.coords.latitude, location.coords.longitude);
+
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
     if (Platform.OS === 'android' && !Constants.isDevice) {
-      setErrorMessage('Oops, this will not work on Sketch in an Android emulator. Try it on your device!');
+      setErrorMessage(
+        'Oops, this will not work on Sketch in an Android emulator. Try it on your device!'
+      );
     } else {
       getLocationAsync();
     }
   }, [getLocationAsync]);
 
   return (
-    <View>
-      {!location && !errorMessage && <Loading />}
-      <Text>{errorMessage && errorMessage}</Text>
-      <Text>{location && JSON.stringify(location, null, 4)}</Text>
-    </View>
+    <>
+      {isLoading && <Loading />}
+      {!isLoading && weather ? (
+        <Weather temp={weather.main.temp} />
+      ) : (
+        <Text>{errorMessage}</Text>
+      )}
+    </>
   );
 }
 
