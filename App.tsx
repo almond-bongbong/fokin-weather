@@ -6,17 +6,21 @@ import * as Permissions from 'expo-permissions';
 import { getWeather } from './src/api/weather';
 import Loading from './src/components/Loading';
 import Weather from './src/components/Weather/Weather';
+import { WeatherConditions } from './src/types';
 
 interface WeatherData {
   main: {
     temp: number;
   };
+  weather: {
+    main: WeatherConditions
+  }[]
 }
 
 function App() {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [weatherData, setWeather] = useState<WeatherData | null>(null);
 
   const initWeather = async (latitude: number, longitude: number) => {
     try {
@@ -52,8 +56,8 @@ function App() {
   return (
     <>
       {isLoading && <Loading />}
-      {!isLoading && weather ? (
-        <Weather temp={weather.main.temp} />
+      {!isLoading && weatherData ? (
+        <Weather temp={Math.round(weatherData.main.temp)} condition={weatherData?.weather[0].main} />
       ) : (
         <Text>{errorMessage}</Text>
       )}
