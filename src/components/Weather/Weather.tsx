@@ -1,23 +1,35 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, StatusBar } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { WeatherConditions } from '../../types';
+import { LinearGradient } from 'expo-linear-gradient';
+import { weatherOptions } from '../../constants/weatherOptions';
 
 interface Props {
   temp: number;
   condition: WeatherConditions;
 }
 
-const Weather: React.FC<Props> = ({ temp }) => {
+interface Weather {
+  iconName: string;
+}
+
+const Weather: React.FC<Props> = ({ temp, condition }) => {
+  const weather: Weather = weatherOptions[condition];
+
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#4c669f', '#3b5998', '#192f6a']}
+      style={styles.container}>
+      <StatusBar barStyle="light-content" hidden />
+
       <View style={styles.halfContainer}>
-        <MaterialCommunityIcons name="weather-lightning-rainy" size={96} />
+        <MaterialCommunityIcons name={weather.iconName} size={96} color="white" />
         <Text style={styles.temp}>{temp}℃</Text>
       </View>
       <View style={styles.halfContainer}>
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -34,6 +46,7 @@ const styles = StyleSheet.create({
   },
   temp: {
     fontSize: 42,
+    color: '#fff'
   }
 });
 
