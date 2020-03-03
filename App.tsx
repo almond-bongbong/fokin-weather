@@ -5,7 +5,7 @@ import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 import { getWeather } from './src/api/weather';
 import Loading from './src/components/Loading';
-import Weather from './src/components/Weather/Weather';
+import WeatherBox from './src/components/WeatherBox';
 import { WeatherConditions } from './src/types';
 
 interface WeatherData {
@@ -57,7 +57,7 @@ function App() {
     <>
       {isLoading && <Loading />}
       {!isLoading && weatherData ? (
-        <Weather temp={Math.round(weatherData.main.temp)} condition={weatherData?.weather[0].main} />
+        <WeatherBox temp={Math.round(weatherData.main.temp)} condition={weatherData?.weather[0].main} />
       ) : (
         <Text>{errorMessage}</Text>
       )}
