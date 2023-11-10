@@ -15,7 +15,7 @@
     "posttest": "yarn run check"
   },
   "dependencies": {
-    "axios": "^0.21.2",
+    "axios": "^1.6.0",
     "expo": "^49.0.3",
     "expo-linear-gradient": "~8.0.0",
     "react": "16.9.0",
